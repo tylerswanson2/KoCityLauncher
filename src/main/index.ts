@@ -732,11 +732,13 @@ function createWindow(): void {
       `-username=${arg.authkey ? arg.authkey : arg.username}`,
       `-backend=${arg.server}`
     ]
-    const game = spawn(`${os.platform() === 'linux' ? 'wine ' : ''}KnockoutCity.exe`, args, {
+    // on linux, "KnockoutCity.exe" is an argument to wine, not the command itself
+    if (os.platform() === 'linux') args.unshift('KnockoutCity.exe')
+    const game = spawn(os.platform() === 'linux' ? 'wine' : 'KnockoutCity.exe', args, {
       cwd: `${arg.path}/${arg.version == 1 ? 'highRes' : 'lowRes'}/KnockoutCity`,
       detached: true,
       stdio: 'ignore',
-      env: {}
+      env: os.platform() === 'linux' ? process.env : {}
     })
     console.log(game.spawnargs)
     event.returnValue = 'launched'
